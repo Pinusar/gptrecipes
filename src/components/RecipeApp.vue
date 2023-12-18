@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive } from 'vue'
 import {fetchDataFromAPI} from "@/services/gptService";
 import Recipe from "@/components/Recipe.vue";
 import getProductData from "@/services/foodDataService";
@@ -28,7 +28,6 @@ let state = reactive({
 async function getRecipes() {
   let prompt = 'Please generate me 3 recipes in JSON format. Here is the JSON format sample: {"recipeName": "Spinach and Feta Stuffed Chicken", "ingredients": [{"item": "ingredient a", "amount": "2 cups"}], "instructions": ["Preheat the oven to 375 degrees F (190 degrees C)."]}. Put them all in json array and dont provide any introduction. Your response must be valid json.';
   let response = await fetchDataFromAPI(prompt, apiKey.value);
-  console.log(response)
   let message = response.choices[0].message.content;
   state.recipes = JSON.parse(message)
 
@@ -38,7 +37,6 @@ async function getRecipes() {
   let content = JSON.parse(secondResponse.choices[0].message.content);
   state.shoppingData.shoppingList = content.shoppingList;
   state.shoppingData.selverProducts = content.selverProducts;
-  console.log(content)
 
 }
 </script>
@@ -46,11 +44,9 @@ async function getRecipes() {
 <template>
   <div>
     <h1>Recipe app</h1>
-    <input type="text" v-model="apiKey">
-    <p>Your api key:
-      <span>{{apiKey}}</span>
-    </p>
-    <button @click="getRecipes">Get recipes</button>
+    <label>Enter API key</label>
+    <input type="password" v-model="apiKey">
+    <button class="button-5" role="button" @click="getRecipes">Get recipes</button>
 
     <div v-for="recipe of state.recipes" :key="recipe.recipeName">
       <Recipe :instructions="recipe.instructions"
@@ -72,4 +68,52 @@ async function getRecipes() {
 
 <style scoped>
 
+input {
+  margin: 1em;
+}
+
+.button-5 {
+  align-items: center;
+  background-clip: padding-box;
+  background-color: #cc033a;
+  border: 1px solid transparent;
+  border-radius: .25rem;
+  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: block;
+  font-family: system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+  margin: 0;
+  min-height: 3rem;
+  padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+  position: relative;
+  text-decoration: none;
+  transition: all 250ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  width: auto;
+}
+
+.button-5:hover,
+.button-5:focus {
+  background-color: #fb8332;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
+
+.button-5:hover {
+  transform: translateY(-1px);
+}
+
+.button-5:active {
+  background-color: #c85000;
+  box-shadow: rgba(0, 0, 0, .06) 0 2px 4px;
+  transform: translateY(0);
+}
 </style>

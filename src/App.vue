@@ -8,7 +8,7 @@ import RecipeApp from "@/components/RecipeApp.vue";
     <img alt="Shop logo" class="logo" src="./assets/Selver_logo.svg.png" width="200" height="200" />
 
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <HelloWorld msg="Looking for recipe ideas?" />
     </div>
   </header>
 
