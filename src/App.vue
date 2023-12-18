@@ -1,6 +1,6 @@
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import RecipeApp from "@/components/RecipeApp.vue";
 </script>
 
 <template>
@@ -13,7 +13,7 @@ import TheWelcome from './components/TheWelcome.vue'
   </header>
 
   <main>
-    <h1>GPT recipes</h1>
+    <RecipeApp />
   </main>
 </template>
 
