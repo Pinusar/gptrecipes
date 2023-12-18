@@ -52,21 +52,34 @@ async function getRecipes() {
 <template>
   <div>
     <h1>Recipe app</h1>
+
     <div v-if="state.status !== 'ready'">
       <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-      <span>Please wait... {{ state.status }}</span>
+      <span>Please wait... {{ state.status }} this might take a while</span>
     </div>
     <div v-else>
       <img alt="Chef picture" src="@/assets/chef.png" width="80" height="80" />
       <span>Type something and let's get started!</span>
     </div>
 
-    <label>Enter API key</label>
-    <input type="password" v-model="apiKey">
+    <div class="container">
+      <form>
+        <div class="group">
+          <input v-model="apiKey" type="password" required>
+          <span class="highlight"></span>
+          <span class="bar"></span>
+          <label>API key</label>
+        </div>
 
-    <br>
-    <label>What kind of recipes are you looking for?</label>
-    <input type="text" v-model="recipeKeyWords">
+        <div class="group">
+          <input v-model="recipeKeyWords" type="text" required>
+          <span class="highlight"></span>
+          <span class="bar"></span>
+          <label>What recipes are you looking for?</label>
+        </div>
+      </form>
+    </div>
+
     <button :disabled="disableButton" class="button-5" role="button" @click="getRecipes">Get recipes</button>
 
     <div v-for="recipe of state.recipes" :key="recipe.recipeName">
@@ -223,4 +236,119 @@ input {
   }
 }
 
+
+/* input stuff */
+* { box-sizing:border-box; }
+
+/* basic stylings ------------------------------------------ */
+.container    {
+  font-family:'Roboto';
+  width:600px;
+  display:block;
+  background:#FFF;
+}
+h2     {
+  text-align:center;
+  margin-bottom:50px;
+}
+h2 small {
+  font-weight:normal;
+  color:#888;
+  display:block;
+}
+.footer   { text-align:center; }
+.footer a  { color:#53B2C8; }
+
+/* form starting stylings ------------------------------- */
+.group        {
+  position:relative;
+  margin-bottom:45px;
+}
+input         {
+  font-size:18px;
+  padding:10px 10px 10px 5px;
+  display:block;
+  width:300px;
+  border:none;
+  border-bottom:1px solid #757575;
+}
+input:focus     { outline:none; }
+
+/* LABEL ======================================= */
+label          {
+  color:#999;
+  font-size:18px;
+  font-weight:normal;
+  position:absolute;
+  pointer-events:none;
+  left:5px;
+  top:10px;
+  transition:0.2s ease all;
+  -moz-transition:0.2s ease all;
+  -webkit-transition:0.2s ease all;
+}
+
+/* active state */
+input:focus ~ label, input:valid ~ label    {
+  top:-20px;
+  font-size:14px;
+  color:#5264AE;
+}
+
+/* BOTTOM BARS ================================= */
+.bar  { position:relative; display:block; width:300px; }
+.bar:before, .bar:after   {
+  content:'';
+  height:2px;
+  width:0;
+  bottom:1px;
+  position:absolute;
+  background:#5264AE;
+  transition:0.2s ease all;
+  -moz-transition:0.2s ease all;
+  -webkit-transition:0.2s ease all;
+}
+.bar:before {
+  left:50%;
+}
+.bar:after {
+  right:50%;
+}
+
+/* active state */
+input:focus ~ .bar:before, input:focus ~ .bar:after {
+  width:50%;
+}
+
+/* HIGHLIGHTER ================================== */
+.highlight {
+  position:absolute;
+  height:60%;
+  width:100px;
+  top:25%;
+  left:0;
+  pointer-events:none;
+  opacity:0.5;
+}
+
+/* active state */
+input:focus ~ .highlight {
+  -webkit-animation:inputHighlighter 0.3s ease;
+  -moz-animation:inputHighlighter 0.3s ease;
+  animation:inputHighlighter 0.3s ease;
+}
+
+/* ANIMATIONS ================ */
+@-webkit-keyframes inputHighlighter {
+  from { background:#5264AE; }
+  to  { width:0; background:transparent; }
+}
+@-moz-keyframes inputHighlighter {
+  from { background:#5264AE; }
+  to  { width:0; background:transparent; }
+}
+@keyframes inputHighlighter {
+  from { background:#5264AE; }
+  to  { width:0; background:transparent; }
+}
 </style>

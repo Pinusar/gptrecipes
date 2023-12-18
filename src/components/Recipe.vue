@@ -16,7 +16,7 @@ defineProps({
 </script>
 
 <template>
-  <h2>{{ recipeName }}</h2>
+  <h1>{{ recipeName }}</h1>
   <ul>
     <li v-for="ingredient of ingredients">{{ ingredient.item }} {{ ingredient.amount }}</li>
   </ul>
