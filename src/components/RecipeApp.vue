@@ -7,7 +7,7 @@ import getProductData from "@/services/foodDataService";
 let rjson = [{
   recipeName: "Sample recipe",
   ingredients: [
-    "Sample ingredient",
+    {item: "Sample ingredient", amount: "200 g"}
   ],
   instructions: [
     "Sample instruction",
