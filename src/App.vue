@@ -5,7 +5,7 @@ import RecipeApp from "@/components/RecipeApp.vue";
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+    <img alt="Shop logo" class="logo" src="./assets/Selver_logo.svg.png" width="200" height="200" />
 
     <div class="wrapper">
       <HelloWorld msg="You did it!" />

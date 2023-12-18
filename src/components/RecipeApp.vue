@@ -33,9 +33,9 @@ async function getRecipes() {
   state.recipes = JSON.parse(message)
 
   let responseFormat = '{"shoppingList": [{"item": "sample item", "amount": "3 cups"}], "selverProducts": [{"productName": "tomatikaste", "url": "www.sampleurl.ee"}]}'
-  let secondPrompt = `Can you make me a unified shopping list based on these recipes? The recipes are in json format: ${message}. And after that, could you find any products from this product list that would be useful for my shopping list? In your answer, please also provide links to the products, baseurl is selver.ee. Please provide answer in pure json format with following structure: ${responseFormat}. The product list is here in html format: ${getProductData()}`
+  let secondPrompt = `Can you make me a unified shopping list based on these recipes? The recipes are in json format: ${message}. And after that, could you find any products from this product list that would be useful for my shopping list? In your answer, please also provide links to the products, baseurl is selver.ee. Please provide answer in pure json format with following structure: ${responseFormat}. Your response must be valid json. The product list is here in html format: ${getProductData()}`
   let secondResponse = await fetchDataFromAPI(secondPrompt, apiKey.value);
-  let content = secondResponse.choices[0].message.content;
+  let content = JSON.parse(secondResponse.choices[0].message.content);
   state.shoppingData.shoppingList = content.shoppingList;
   state.shoppingData.selverProducts = content.selverProducts;
   console.log(content)
