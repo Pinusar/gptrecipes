@@ -4,19 +4,11 @@ import {fetchDataFromAPI} from "@/services/gptService";
 import Recipe from "@/components/Recipe.vue";
 import getProductData from "@/services/foodDataService";
 
-let rjson = [{
-  recipeName: "Sample recipe",
-  ingredients: [
-    {item: "Sample ingredient", amount: "200 g"}
-  ],
-  instructions: [
-    "Sample instruction",
-  ]
-}]
+let rjson = {}
 
 let shoppingData = {
-  shoppingList: [{item: "sample item", amount: "3 cups"}],
-  selverProducts: [{productName: "tomatikaste", url: "www.sampleurl.ee"}]
+  shoppingList: [],
+  selverProducts: []
 }
 
 let apiKey = ref('')
@@ -29,71 +21,66 @@ let state = reactive({
 })
 
 async function getRecipes() {
-  disableButton.value= true
-  state.status = 'Generating recipes...'
-  let prompt = `Please generate me 3 recipes in JSON format for following keywords ${recipeKeyWords.value}. Here is the JSON format sample: {"recipeName": "Spinach and Feta Stuffed Chicken", "ingredients": [{"item": "ingredient a", "amount": "2 cups"}], "instructions": ["Preheat the oven to 375 degrees F (190 degrees C)."]}. Put them all in json array and dont provide any introduction. Your response must be valid json.`;
-  let response = await fetchDataFromAPI(prompt, apiKey.value);
+  disableButton.value = true
+  state.status = 'Meisterkokk mõtleb retsepti...'
+  let prompt = `Please generate me one recipe in JSON format using following ingredients ${recipeKeyWords.value}. Include the listed ingredients, but you can also add more items to get a tasty and interesting recipe. Here is the JSON format sample: {"recipeName": "Spinati ja fetaga täidetd kana", "ingredients": [{"item": "koostisosa a", "amount": "200 g"}], "instructions": ["Eelsoojenda ahi 190 kraadini"]}. Use metric system for measurement (grams and ml). Put them all in json array and dont provide any introduction. Your response must be valid json.`;
+  let response = await fetchDataFromAPI(prompt, "");
   let message = response.choices[0].message.content;
   state.recipes = JSON.parse(message)
 
-  state.status = 'Generating shopping list...'
-  let responseFormat = '{"shoppingList": [{"item": "sample item", "amount": "3 cups"}], "selverProducts": [{"productName": "tomatikaste", "url": "www.sampleurl.ee"}]}'
-  let secondPrompt = `Can you make me a unified shopping list based on these recipes? The recipes are in json format: ${message}. And after that, could you find any products from this product list that would be useful for my shopping list? In your answer, please also provide links to the products, baseurl is selver.ee. Please provide answer in pure json format with following structure: ${responseFormat}. NB! Your response must be valid json! So no introduction text etc! The product list is here in html format: ${getProductData()}`
-  let secondResponse = await fetchDataFromAPI(secondPrompt, apiKey.value);
+  state.status = 'Meisterkokk paneb ostunimekirja kokku...'
+  let responseFormat = '{"shoppingList": [{"item": "sample item", "amount": "3 cups"}], "selverProducts": [{"productName": "tomatikaste", "url": "www.sampleurl.ee", "sku": "T000079918"}]}'
+  let secondPrompt = `Can you make me a shopping list based on this recipe? The recipe is in json format: ${message}. And after that, could you find any products from this product list that would be useful for my shopping list? ONly use exact product names and url_key's that are in the attached product list. Try to find a counterpart in the products list for every product in the shopping list. If there is no good match, then skip this product. In your answer, please also provide links to the products, baseurl is https://www.selver.ee. Please provide answer in pure json format with following structure: ${responseFormat}. NB! Your response must be valid json! So no introduction text etc! The product list is here in json format: ${getProductData()}`
+  let secondResponse = await fetchDataFromAPI(secondPrompt, "");
   let content = JSON.parse(secondResponse.choices[0].message.content);
   state.shoppingData.shoppingList = content.shoppingList;
   state.shoppingData.selverProducts = content.selverProducts;
 
   state.status = 'ready'
-  disableButton.value= false
+  disableButton.value = false
 }
 </script>
 
 <template>
   <div>
-    <h1>Recipe app</h1>
+    <h1>Retseptigeneraator</h1>
 
     <div v-if="state.status !== 'ready'">
       <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-      <span>Please wait... {{ state.status }} this might take a while</span>
+      <span>Palun oodake veidi... {{ state.status }} . See võib pisut aega võtta.</span>
     </div>
     <div v-else>
       <img alt="Chef picture" src="@/assets/chef.png" width="80" height="80" />
-      <span>Type something and let's get started!</span>
+      <span>Sisestage paar koostisosa, genereerime nendega maitsva retsepti!</span>
     </div>
 
     <div class="container">
       <form>
         <div class="group">
-          <input v-model="apiKey" type="password" required>
-          <span class="highlight"></span>
-          <span class="bar"></span>
-          <label>API key</label>
-        </div>
-
-        <div class="group">
           <input v-model="recipeKeyWords" type="text" required>
           <span class="highlight"></span>
           <span class="bar"></span>
-          <label>What recipes are you looking for?</label>
+          <label>Millest süüa teha soovid?</label>
         </div>
       </form>
     </div>
 
-    <button :disabled="disableButton" class="button-5" role="button" @click="getRecipes">Get recipes</button>
+    <button :disabled="disableButton" class="button-5" role="button" @click="getRecipes">Otsi retsepte</button>
 
-    <div v-for="recipe of state.recipes" :key="recipe.recipeName">
+    <h1 v-if="state.recipes.recipes">Recipes</h1>
+
+    <div v-for="recipe of state.recipes.recipes" :key="recipe.recipeName">
       <Recipe :instructions="recipe.instructions"
               :ingredients="recipe.ingredients"
               :recipeName="recipe.recipeName" />
     </div>
 
-    <h1>Shopping List</h1>
+    <h1 v-if="state.shoppingData.shoppingList?.length > 0">Poenimekiri</h1>
     <ul>
       <li v-for="entry of state.shoppingData.shoppingList">{{ entry.item }} {{ entry.amount }}</li>
     </ul>
 
-    <h1>Get the products from Selver</h1>
+    <h1 v-if="state.shoppingData.selverProducts?.length > 0">Osta tooted mugavalt Selverist</h1>
     <ul>
       <li v-for="entry of state.shoppingData.selverProducts"> {{ entry.productName }} ( <a :href="entry.url">{{ entry.url }}</a> ) </li>
     </ul>
